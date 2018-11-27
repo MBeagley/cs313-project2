@@ -1,18 +1,25 @@
 const request = require('request');
 const argv = require('yargs').argv;
+var http = require('http');
 
 let apiKey = '931352d23bf0035e3f149f95319b1284';
 let city = argv.c || 'salt lake city';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
 
 request(url, function (err, response, body) {
-  if(err){
-    console.log('error:', error);
-  } else {
-  	let weather = JSON.parse(body)
-    let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
-    console.log(message);
-  }
+	if(err){
+		console.log('error:', error);
+	} else {
+		let weather = JSON.parse(body)
+		let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+		http.createServer(function (req, res) {
+  			res.write(message); //write a response to the client
+  			res.end(); //end the response
+		}).listen(8080); //the server object listens on port 8080
+
+
+		console.log(message);
+	}
 });
 
 // const fs = require('fs');
@@ -57,7 +64,7 @@ request(url, function (err, response, body) {
 // //  * execute the given callback with the authorized OAuth2 client.
 // //  * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
 // //  * @param {getEventsCallback} callback The callback for the authorized client.
- 
+
 // function getAccessToken(oAuth2Client, callback) {
 //   const authUrl = oAuth2Client.generateAuthUrl({
 //     access_type: 'offline',
