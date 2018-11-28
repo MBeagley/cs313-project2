@@ -2,19 +2,34 @@ const request = require('request');
 const argv = require('yargs').argv;
 var http = require('http');
 
+const express = require('express')
+const path = require('path')
+const PORT = process.env.PORT || 5000
+
+express()
+.use(express.static(path.join(__dirname, 'public')))
+.set('views', path.join(__dirname, 'views'))
+.set('view engine', 'ejs')
+.get('/', (req, res) => res.send(getWeather()))
+.listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+
 let apiKey = '931352d23bf0035e3f149f95319b1284';
 let city = argv.c || 'salt lake city';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
 
-request(url, function (err, response, body) {
-	if(err){
-		console.log('error:', error);
-	} else {
-		let weather = JSON.parse(body)
-		let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
-		console.log(message);
-	}
-});
+getWeather = () => {
+	request(url, function (err, response, body) {
+		if(err){
+			console.log('error:', error);
+		} else {
+			let weather = JSON.parse(body)
+			let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+			console.log(message);
+			return message;
+		}
+	});
+}
 
 const fs = require('fs');
 const readline = require('readline');
