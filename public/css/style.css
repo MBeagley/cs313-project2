@@ -1,0 +1,49 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #333333;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 49%;
+    padding: 10px;
+    height: 290px; /* Should be removed. Only for demonstration */
+    margin: .5%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: #f1f1f1;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.innerColumn {
+    float: left;
+    width: 50%;
+}
+
+/* Clear floats after the columns */
+.innerRow:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.title {
+    background-color: #e6b800;
+    overflow: hidden;
+    margin: -10px;
+    text-align: center;
+}
+
+.todoList {
+    height: 140px;
+    overflow: scroll;
+}

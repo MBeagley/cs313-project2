@@ -1,35 +1,75 @@
 const request = require('request');
 const argv = require('yargs').argv;
 var http = require('http');
+const bodyParser = require('body-parser');
 
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
+const apiKey = '931352d23bf0035e3f149f95319b1284';
+
+var task = [];
+var complete = [];
+var myWeather = null;
 
 express()
 .use(express.static(path.join(__dirname, 'public')))
+.use(express.static('public'))
+.use(bodyParser.urlencoded({ extended: true }))
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
-.get('/', (req, res) => res.send(getWeather()))
+.get('/', function (req, res) {
+	res.render('homepage', {weather: myWeather, task: task});
+})
+.post('/getWeather', function (req, res) {
+	let city = req.body.city;
+	let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
+	request(url, function (err, response, body) {
+		if(err){
+			myWeather = null;
+			res.redirect("/");
+		} else {
+			let weather = JSON.parse(body)
+			if(weather.main == undefined){
+				weather = null;
+				res.redirect("/");
+			} else {
+				let weatherText = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+				myWeather = weatherText;
+				res.redirect("/");
+			}
+		}
+	});
+})
+.post('/addTask', function (req, res) {
+	var newTask = req.body.newtask;
+
+	task.push(newTask);
+
+	res.redirect("/");
+})
+.post("/removetask", function(req, res) {
+	var completeTask = req.body.check;
+
+	if (typeof completeTask === "string") {
+		complete.push(completeTask);
+
+		task.splice(task.indexOf(completeTask), 1);
+		complete = [];
+	} else if (typeof completeTask === "object") {
+		for (var i = 0; i < completeTask.length; i++) {     
+			complete.push(completeTask[i]);
+			task.splice(task.indexOf(completeTask[i]), 1);
+			complete = [];
+		}
+	}
+	res.redirect("/");
+})
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
-let apiKey = '931352d23bf0035e3f149f95319b1284';
-let city = argv.c || 'salt lake city';
-let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
 
-getWeather = () => {
-	request(url, function (err, response, body) {
-		if(err){
-			console.log('error:', error);
-		} else {
-			let weather = JSON.parse(body)
-			let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
-			console.log(message);
-			return message;
-		}
-	});
-}
+
 
 const fs = require('fs');
 const readline = require('readline');
@@ -44,7 +84,7 @@ const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
+	if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Calendar API.
   authorize(JSON.parse(content), listEvents);
 });
@@ -55,16 +95,16 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+ function authorize(credentials, callback) {
+ 	const {client_secret, client_id, redirect_uris} = credentials.installed;
+ 	const oAuth2Client = new google.auth.OAuth2(
+ 		client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getAccessToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
+  	if (err) return getAccessToken(oAuth2Client, callback);
+  	oAuth2Client.setCredentials(JSON.parse(token));
+  	callback(oAuth2Client);
   });
 }
 
@@ -75,53 +115,53 @@ function authorize(credentials, callback) {
 //  * @param {getEventsCallback} callback The callback for the authorized client.
 
 function getAccessToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token', err);
-      oAuth2Client.setCredentials(token);
+	const authUrl = oAuth2Client.generateAuthUrl({
+		access_type: 'offline',
+		scope: SCOPES,
+	});
+	console.log('Authorize this app by visiting this url:', authUrl);
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
+	rl.question('Enter the code from that page here: ', (code) => {
+		rl.close();
+		oAuth2Client.getToken(code, (err, token) => {
+			if (err) return console.error('Error retrieving access token', err);
+			oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
       fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
+      	if (err) console.error(err);
+      	console.log('Token stored to', TOKEN_PATH);
       });
       callback(oAuth2Client);
-    });
   });
+	});
 }
 
 /**
  * Lists the next 10 events on the user's primary calendar.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
-  calendar.events.list({
-    calendarId: 'primary',
-    timeMin: (new Date()).toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  }, (err, res) => {
-    if (err) return console.log('The API returned an error: ' + err);
-    const events = res.data.items;
-    if (events.length) {
-      console.log('Upcoming 10 events:');
-      events.map((event, i) => {
-        const start = event.start.dateTime || event.start.date;
-        console.log(`${start} - ${event.summary}`);
-      });
-    } else {
-      console.log('No upcoming events found.');
-    }
-  });
-}
+ function listEvents(auth) {
+ 	const calendar = google.calendar({version: 'v3', auth});
+ 	calendar.events.list({
+ 		calendarId: 'primary',
+ 		timeMin: (new Date()).toISOString(),
+ 		maxResults: 10,
+ 		singleEvents: true,
+ 		orderBy: 'startTime',
+ 	}, (err, res) => {
+ 		if (err) return console.log('The API returned an error: ' + err);
+ 		const events = res.data.items;
+ 		if (events.length) {
+ 			console.log('Upcoming 10 events:');
+ 			events.map((event, i) => {
+ 				const start = event.start.dateTime || event.start.date;
+ 				console.log(`${start} - ${event.summary}`);
+ 			});
+ 		} else {
+ 			console.log('No upcoming events found.');
+ 		}
+ 	});
+ }
