@@ -11,6 +11,7 @@ const apiKey = '931352d23bf0035e3f149f95319b1284';
 var task = [];
 var complete = [];
 var myWeather = null;
+var myEvents = [];
 
 express()
 .use(express.static(path.join(__dirname, 'public')))
@@ -19,7 +20,7 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	res.render('homepage', {weather: myWeather, task: task});
+	res.render('homepage', {weather: myWeather, task: task, events: myEvents});
 })
 .post('/getWeather', function (req, res) {
 	let city = req.body.city;
@@ -159,9 +160,11 @@ function getAccessToken(oAuth2Client, callback) {
  			events.map((event, i) => {
  				const start = event.start.dateTime || event.start.date;
  				console.log(`${start} - ${event.summary}`);
+ 				myEvents.push(`${start} - ${event.summary}`);
  			});
  		} else {
  			console.log('No upcoming events found.');
+ 			myEvents = [];
  		}
  	});
  }
