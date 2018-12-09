@@ -11,63 +11,78 @@
       <div class="title">
         <h3>Personal Calendar</h3>
       </div>
-      <br/>
-      <% for( var i = 0; i < events.length; i++){ %>
-      <li> <%= events[i] %> </li>
-      <% } %>
-      <p>Some text..</p>      
-    </div>
-    <div class="column">
-      <div class="title" style="background-color:#0099cc;">
-        <h3>Local Weather</h3>
-      </div>
-      <br/>
-      <form action="/getWeather" method="post">
-        <input name="city" type="text" placeholder="Enter a City" required>
-        <input type="submit" value="Get Weather">
-      </form>
-      <% if(weather !== null){ %>
-      <p><%= weather %></p>
-      <% } %>
-
-      <% if(weather == null){ %>
-      <p>Please enter a valid city.</p>
-      <% } %>
-    </div>
-  </div>
-  <div class="row">
-    <div class="column">
-      <div class="title" style="background-color:#009900;">
-        <h3>Notes</h3>
-      </div>
-      <p>Some text..</p>
-    </div>
-    <div class="column">
-      <div class="title" style="background-color:#cc0000;">
-        <h3>To-Do List</h3>
-      </div>
       <div class="innerRow">
         <div class="innerColumn">
-         <h2> Add a Task </h2>
-         <form action ="/addTask" method="POST">
-           <input type="text" name="newtask" placeholder="add new task">        
-           <br/>
-           <br/>
-           <button> Add Task </button>
-         </div>
-         <div class="innerColumn">
-           <h2> Task List </h2>
-           <div class="todoList">
-             <% for( var i = 0; i < task.length; i++){ %>
-             <li><input type="checkbox" name="check" value="<%= task[i] %>" /> <%= task[i] %> </li>
-             <% } %>
-           </div>
-           <button formaction="/removeTask" type="submit"> Remove </button>
+          <br/>
+          <% for( var i = 0; i < events.length; i++){ %>
+          <li> <%= events[i] %> </li>
+          <% } %>
+          <form action ="/getEvents" method="POST">
+            <button formaction="/getEvents" type="submit"> Get Events </button>
+          </form>
+        </div>
+        <div class="innerColumn">
+          <br/>
+          <form action ="/addEvent" method="POST">
+            Title: <input type="text" name="eventTitle" placeholder="Event Title"> <br/>
+            Start: <input type="datetime-local" name="startTime"> <br/>
+            End: <input type="datetime-local" name="endTime"> <br/>
+           <button formaction="/addEvent" type="submit"> Add Event </button>
          </form>
-       </div>     
-     </div>
+       </div>
+     </div>          
+   </div>
+   <div class="column">
+    <div class="title" style="background-color:#0099cc;">
+      <h3>Local Weather</h3>
+    </div>
+    <br/>
+    <form action="/getWeather" method="post">
+      <input name="city" type="text" placeholder="Enter a City" required>
+      <input type="submit" value="Get Weather">
+    </form>
+    <% if(weather !== null){ %>
+    <p><%= weather %></p>
+    <% } %>
+
+    <% if(weather == null){ %>
+    <p>Please enter a valid city.</p>
+    <% } %>
+  </div>
+</div>
+<div class="row">
+  <div class="column">
+    <div class="title" style="background-color:#009900;">
+      <h3>Notes</h3>
+    </div>
+    <p>Some text..</p>
+  </div>
+  <div class="column">
+    <div class="title" style="background-color:#cc0000;">
+      <h3>To-Do List</h3>
+    </div>
+    <div class="innerRow">
+      <div class="innerColumn">
+       <h3> Add a Task </h3>
+       <form action ="/addTask" method="POST">
+         <input type="text" name="newtask" placeholder="add new task">        
+         <br/>
+         <br/>
+         <button> Add Task </button>
+       </div>
+       <div class="innerColumn">
+         <h3> Task List </h3>
+         <div class="todoList">
+           <% for( var i = 0; i < task.length; i++){ %>
+           <li><input type="checkbox" name="check" value="<%= task[i] %>" /> <%= task[i] %> </li>
+           <% } %>
+         </div>
+         <button formaction="/removeTask" type="submit"> Remove </button>
+       </form>
+     </div>     
    </div>
  </div>
+</div>
 
 </body>
 </html>

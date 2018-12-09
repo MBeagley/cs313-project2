@@ -8,6 +8,17 @@ const path = require('path')
 const PORT = process.env.PORT || 5000
 const apiKey = '931352d23bf0035e3f149f95319b1284';
 
+const fs = require('fs');
+const readline = require('readline');
+const {google} = require('googleapis');
+
+// If modifying these scopes, delete token.json.
+const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+// The file token.json stores the user's access and refresh tokens, and is
+// created automatically when the authorization flow completes for the first
+// time.
+const TOKEN_PATH = 'token.json';
+
 var task = [];
 var complete = [];
 var myWeather = null;
@@ -20,6 +31,7 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
+	//calendarInteract(listEvents);
 	res.render('homepage', {weather: myWeather, task: task, events: myEvents});
 })
 .post('/getWeather', function (req, res) {
@@ -66,29 +78,42 @@ express()
 	}
 	res.redirect("/");
 })
+.post("/getEvents", function(req, res) {
+	calendarInteract(listEvents);
+	res.redirect("/");
+})
+.post("/addEvent", function(req, res) {
+	var start = req.body.startTime + ":00-07:00";
+	var end = req.body.endTime + ":00-07:00";
+	var event = {
+ 		'summary': req.body.eventTitle,
+ 		'start': {
+ 			'dateTime': start,
+ 			'timeZone': 'America/Los_Angeles',
+ 		},
+ 		'end': {
+ 			'dateTime': end,
+ 			'timeZone': 'America/Los_Angeles',
+ 		},
+ 	};
+	calendarInteract(addEvent, event);
+	calendarInteract(listEvents, event);
+
+	res.redirect("/");
+})
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
 
 
-
-const fs = require('fs');
-const readline = require('readline');
-const {google} = require('googleapis');
-
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json';
-
 // Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-	if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Calendar API.
-  authorize(JSON.parse(content), listEvents);
-});
+function calendarInteract(callback, event) {
+	fs.readFile('credentials.json', (err, content) => {
+		if (err) return console.log('Error loading client secret file:', err);
+        // Authorize a client with credentials, then call the Google Calendar API.
+        authorize(JSON.parse(content), callback, event);
+    });
+}
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -96,7 +121,7 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
- function authorize(credentials, callback) {
+ function authorize(credentials, callback, event) {
  	const {client_secret, client_id, redirect_uris} = credentials.installed;
  	const oAuth2Client = new google.auth.OAuth2(
  		client_id, client_secret, redirect_uris[0]);
@@ -105,7 +130,7 @@ fs.readFile('credentials.json', (err, content) => {
   fs.readFile(TOKEN_PATH, (err, token) => {
   	if (err) return getAccessToken(oAuth2Client, callback);
   	oAuth2Client.setCredentials(JSON.parse(token));
-  	callback(oAuth2Client);
+  	callback(oAuth2Client, event);
   });
 }
 
@@ -145,6 +170,7 @@ function getAccessToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
  function listEvents(auth) {
+ 	myEvents = [];
  	const calendar = google.calendar({version: 'v3', auth});
  	calendar.events.list({
  		calendarId: 'primary',
@@ -161,10 +187,55 @@ function getAccessToken(oAuth2Client, callback) {
  				const start = event.start.dateTime || event.start.date;
  				console.log(`${start} - ${event.summary}`);
  				myEvents.push(`${start} - ${event.summary}`);
+ 				console.log(myEvents);
  			});
  		} else {
  			console.log('No upcoming events found.');
  			myEvents = [];
  		}
+ 	});
+ }
+
+
+ function addEvent(auth, event) {
+ 	// var event = {
+ 	// 	'summary': 'Google I/O 2015',
+ 	// 	'location': '800 Howard St., San Francisco, CA 94103',
+ 	// 	'description': 'A chance to hear more about Google\'s developer products.',
+ 	// 	'start': {
+ 	// 		'dateTime': '2018-12-28T09:00:00-07:00',
+ 	// 		'timeZone': 'America/Los_Angeles',
+ 	// 	},
+ 	// 	'end': {
+ 	// 		'dateTime': '2018-12-28T17:00:00-07:00',
+ 	// 		'timeZone': 'America/Los_Angeles',
+ 	// 	},
+ 	// 	'recurrence': [
+ 	// 	'RRULE:FREQ=DAILY;COUNT=2'
+ 	// 	],
+ 	// 	'attendees': [
+ 	// 	{'email': 'lpage@example.com'},
+ 	// 	{'email': 'sbrin@example.com'},
+ 	// 	],
+ 	// 	'reminders': {
+ 	// 		'useDefault': false,
+ 	// 		'overrides': [
+ 	// 		{'method': 'email', 'minutes': 24 * 60},
+ 	// 		{'method': 'popup', 'minutes': 10},
+ 	// 		],
+ 	// 	},
+ 	// };
+
+ 	const calendar = google.calendar({version: 'v3', auth});
+ 	calendar.events.insert({
+ 		auth: auth,
+ 		calendarId: 'primary',
+ 		resource: event,
+ 	}, function(err, event) {
+ 		if (err) {
+ 			console.log('There was an error contacting the Calendar service: ' + err);
+ 			return;
+ 		}
+ 		console.log('Event created: %s', event.htmlLink);
  	});
  }
