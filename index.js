@@ -31,6 +31,7 @@ var complete = [];
 var myWeather = null;
 var myEvents = [];
 var myForecast = null;
+var myZipcode = null;
 
 express()
 .use(express.static(path.join(__dirname, 'public')))
@@ -48,7 +49,6 @@ express()
 		const result = await client.query('SELECT * FROM users');
 		const results = { 'results': (result) ? result.rows : null};
 		console.log(results);
-		//res.render('pages/db', results );
 		client.release();
 	} catch (err) {
 		console.error(err);
@@ -126,7 +126,7 @@ express()
 })
 .post("/getEvents", function(req, res) {
 	calendarInteract(listEvents);
-	res.redirect("/");
+	res.redirect("/");	
 })
 .post("/addEvent", function(req, res) {
 	var start = req.body.startTime + ":00-07:00";
