@@ -49,8 +49,9 @@ express()
 		const result = await client.query('SELECT * FROM users');
 		const results = { 'results': (result) ? result.rows : null};
 		console.log(results);
-		let myResults = JSON.parse(results)
-		myZipcode = myResults[0].zipcode;
+		results.forEach(function(r) {
+			myZipcode = r.zipcode;
+		});
 		client.release();
 	} catch (err) {
 		console.error(err);
