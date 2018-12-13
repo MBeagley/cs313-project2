@@ -49,15 +49,21 @@ express()
 		const result = await client.query('SELECT * FROM users');
 		const results = { 'results': (result) ? result.rows : null};
 		console.log(results);
+		myZipcode = result[0].zipcode;
 		client.release();
 	} catch (err) {
 		console.error(err);
 		res.send("Error " + err);
 	}
-	res.redirect("/");
+	res.redirect("/getWeather");
 })
 .post('/getWeather', function (req, res) {
-	let zip = req.body.zip;
+	if (myZipcode !== null) {
+		let zip = req.body.zip;
+	}
+	else {
+		let zip = myZipcode;
+	}
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
 	request(currUrl, function (err, response, body) {
