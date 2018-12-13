@@ -54,6 +54,7 @@ express()
 		console.error(err);
 		res.send("Error " + err);
 	}
+	res.redirect("/");
 })
 .post('/getWeather', function (req, res) {
 	let zip = req.body.zip;
