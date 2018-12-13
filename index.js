@@ -49,7 +49,8 @@ express()
 		const result = await client.query('SELECT * FROM users');
 		const results = { 'results': (result) ? result.rows : null};
 		console.log(results);
-		myZipcode = results[0]['zipcode'];
+		let myResults = JSON.parse(results)
+		myZipcode = myResults[0].zipcode;
 		client.release();
 	} catch (err) {
 		console.error(err);
