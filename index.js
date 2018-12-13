@@ -12,6 +12,13 @@ const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
 
+const { Pool } = require('pg');
+const pool = new Pool({
+	connectionString: process.env.DATABASE_URL,
+	sslmode: require
+	//ssl: false
+});
+
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -23,6 +30,7 @@ var task = [];
 var complete = [];
 var myWeather = null;
 var myEvents = [];
+var myForecast = null;
 
 express()
 .use(express.static(path.join(__dirname, 'public')))
@@ -32,12 +40,26 @@ express()
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
 	//calendarInteract(listEvents);
-	res.render('homepage', {weather: myWeather, task: task, events: myEvents});
+	res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
+})
+.get('/db', async (req, res) => {
+	try {
+		const client = await pool.connect()
+		const result = await client.query('SELECT * FROM users');
+		const results = { 'results': (result) ? result.rows : null};
+		console.log(results);
+		//res.render('pages/db', results );
+		client.release();
+	} catch (err) {
+		console.error(err);
+		res.send("Error " + err);
+	}
 })
 .post('/getWeather', function (req, res) {
-	let city = req.body.city;
-	let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
-	request(url, function (err, response, body) {
+	let zip = req.body.zip;
+	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
+	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
+	request(currUrl, function (err, response, body) {
 		if(err){
 			myWeather = null;
 			res.redirect("/");
@@ -45,10 +67,33 @@ express()
 			let weather = JSON.parse(body)
 			if(weather.main == undefined){
 				weather = null;
+				//res.redirect("/");
+			} else {
+				var currWeather = {
+					'city': weather.name,
+					'temp': weather.main.temp,
+					'condition': weather.weather[0].main,
+					'icon': weather.weather[0].icon,
+				};
+				//let weatherText = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+				myWeather = currWeather;
+				//res.redirect("/");
+			}
+		}
+	});
+	request(forecastUrl, function (err, response, body) {
+		if(err){
+			myForecast = null;
+			res.redirect("/");
+		} else {
+			let forecast = JSON.parse(body)
+			if(forecast.list == undefined){
+				myForecast = null;
+				console.log(null);
 				res.redirect("/");
 			} else {
-				let weatherText = `It's ${weather.main.temp} degrees in ${weather.name}!`;
-				myWeather = weatherText;
+				myForecast = parseForecast(forecast);
+				console.log(myForecast);
 				res.redirect("/");
 			}
 		}
@@ -86,22 +131,108 @@ express()
 	var start = req.body.startTime + ":00-07:00";
 	var end = req.body.endTime + ":00-07:00";
 	var event = {
- 		'summary': req.body.eventTitle,
- 		'start': {
- 			'dateTime': start,
- 			'timeZone': 'America/Los_Angeles',
- 		},
- 		'end': {
- 			'dateTime': end,
- 			'timeZone': 'America/Los_Angeles',
- 		},
- 	};
+		'summary': req.body.eventTitle,
+		'start': {
+			'dateTime': start,
+			'timeZone': 'America/Los_Angeles',
+		},
+		'end': {
+			'dateTime': end,
+			'timeZone': 'America/Los_Angeles',
+		},
+	};
 	calendarInteract(addEvent, event);
 	calendarInteract(listEvents, event);
 
 	res.redirect("/");
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+
+
+function parseForecast(forecast) {
+	console.log(forecast);
+	var day1 = readDate(forecast.list[5].dt_txt);
+	var day2 = readDate(forecast.list[13].dt_txt);
+	var day3 = readDate(forecast.list[21].dt_txt);
+	var day4 = readDate(forecast.list[29].dt_txt);
+	var day5 = readDate(forecast.list[37].dt_txt);
+
+	var high = [];
+	var low = [];
+	var j = 0;
+	var tempHigh;
+	var tempLow;
+
+	for (var i = 0; i < forecast.cnt; i++) {
+		if (i % 8 == 1) {
+			tempHigh = forecast.list[i].main.temp;
+			tempLow = forecast.list[i].main.temp;
+		}
+		if (forecast.list[i].main.temp > tempHigh) {
+			tempHigh = forecast.list[i].main.temp;
+		}
+		if (forecast.list[i].main.temp < tempLow) {
+			tempLow = forecast.list[i].main.temp;
+		}
+		if (i % 8 == 0 && i != 0) {
+			high[j] = tempHigh;
+			low[j] = tempLow;
+			j++;
+		}
+	}
+
+
+	var currForecast = {
+		"days" : [
+		{'date' : day1,
+		'temp': forecast.list[5].main.temp,
+		'high': high[0],
+		'low': low[0],
+		'condition': forecast.list[5].weather[0].main,
+		'icon': forecast.list[5].weather[0].icon,},
+		{'date' : day2,
+		'temp': forecast.list[13].main.temp,
+		'high': high[1],
+		'low': low[1],
+		'condition': forecast.list[13].weather[0].main,
+		'icon': forecast.list[13].weather[0].icon,},
+		{'date' : day3,
+		'temp': forecast.list[21].main.temp,
+		'high': high[2],
+		'low': low[2],
+		'condition': forecast.list[21].weather[0].main,
+		'icon': forecast.list[21].weather[0].icon,},
+		{'date' : day4,
+		'temp': forecast.list[29].main.temp,
+		'high': high[3],
+		'low': low[3],
+		'condition': forecast.list[29].weather[0].main,
+		'icon': forecast.list[29].weather[0].icon,},
+		{'date' : day5,
+		'temp': forecast.list[37].main.temp,
+		'high': high[4],
+		'low': low[4],
+		'condition': forecast.list[37].weather[0].main,
+		'icon': forecast.list[37].weather[0].icon,},
+		],
+	};
+
+	return currForecast;
+}
+
+function readDate(dateTime) {
+	//2018-12-12 21:00:00
+	var myDateTime = dateTime.split(" ");
+	var date = myDateTime[0].split("-");
+
+	var year = date[0];
+	var month = date[1];
+	var day = date[2];
+
+	var readDate = month + "/" + day + "/" + year;
+	return readDate;
+}
 
 
 
@@ -165,6 +296,33 @@ function getAccessToken(oAuth2Client, callback) {
 	});
 }
 
+function readableDate(dateTime){
+	//2018-12-11T10:00:00-07:00
+	var myDateTime = dateTime.split("T");
+	var date = myDateTime[0].split("-");
+	var time = myDateTime[1].split(":");
+
+	var year = date[0];
+	var month = date[1];
+	var day = date[2];
+
+	var hour = time[0];
+	var minute = time[1];
+
+	var dayNight;
+
+	if (hour > 12) {
+		dayNight = "PM";
+		hour = hour - 12;
+	}
+	else {
+		dayNight = "AM";
+	}
+
+	var readableString = month + "/" + day + "/" + year + "  " + hour + ":" + minute + dayNight;
+	return readableString;
+}
+
 /**
  * Lists the next 10 events on the user's primary calendar.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
@@ -185,8 +343,9 @@ function getAccessToken(oAuth2Client, callback) {
  			console.log('Upcoming 10 events:');
  			events.map((event, i) => {
  				const start = event.start.dateTime || event.start.date;
- 				console.log(`${start} - ${event.summary}`);
- 				myEvents.push(`${start} - ${event.summary}`);
+ 				var readDate = readableDate(start);
+ 				console.log(`${readDate} - ${event.summary}`);
+ 				myEvents.push(`${readDate} - ${event.summary}`);
  				console.log(myEvents);
  			});
  		} else {
@@ -198,33 +357,6 @@ function getAccessToken(oAuth2Client, callback) {
 
 
  function addEvent(auth, event) {
- 	// var event = {
- 	// 	'summary': 'Google I/O 2015',
- 	// 	'location': '800 Howard St., San Francisco, CA 94103',
- 	// 	'description': 'A chance to hear more about Google\'s developer products.',
- 	// 	'start': {
- 	// 		'dateTime': '2018-12-28T09:00:00-07:00',
- 	// 		'timeZone': 'America/Los_Angeles',
- 	// 	},
- 	// 	'end': {
- 	// 		'dateTime': '2018-12-28T17:00:00-07:00',
- 	// 		'timeZone': 'America/Los_Angeles',
- 	// 	},
- 	// 	'recurrence': [
- 	// 	'RRULE:FREQ=DAILY;COUNT=2'
- 	// 	],
- 	// 	'attendees': [
- 	// 	{'email': 'lpage@example.com'},
- 	// 	{'email': 'sbrin@example.com'},
- 	// 	],
- 	// 	'reminders': {
- 	// 		'useDefault': false,
- 	// 		'overrides': [
- 	// 		{'method': 'email', 'minutes': 24 * 60},
- 	// 		{'method': 'popup', 'minutes': 10},
- 	// 		],
- 	// 	},
- 	// };
 
  	const calendar = google.calendar({version: 'v3', auth});
  	calendar.events.insert({

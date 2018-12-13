@@ -2,6 +2,7 @@ CREATE TABLE users (
   id SERIAL,
   username VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  zipcode VARCHAR(5),
   PRIMARY KEY (id)
 );
 
@@ -23,3 +24,5 @@ CREATE TABLE toDo (
 	PRIMARY KEY (id),
 	FOREIGN KEY (userId) REFERENCES users(id)
 );
+
+INSERT INTO users (username,password,zipcode) VALUES ('user','password','84047');
