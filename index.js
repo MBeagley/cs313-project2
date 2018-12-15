@@ -73,7 +73,7 @@ express()
 	// 	console.error(err);
 	// 	res.send("Error " + err);
 	// }
-	res.redirect("/getWeather");
+	res.redirect("/");
 })
 .post('/getWeather', function (req, res) {
 	if (myZipcode !== null) {
