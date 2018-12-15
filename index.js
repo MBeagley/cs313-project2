@@ -146,8 +146,9 @@ express()
 	calendarInteract(listEvents);
 	setTimeout(function () {
 		console.log("Waiting");
-	}, 1000);
-	res.redirect("/");	
+		res.redirect("/");
+	}, 2000);
+	//res.redirect("/");	
 })
 .post("/addEvent", function(req, res) {
 	var start = req.body.startTime + ":00-07:00";
