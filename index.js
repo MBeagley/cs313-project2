@@ -84,42 +84,8 @@ express()
 })
 .post('/getWeather', function (req, res) {
 	let zip = req.body.zip;
-	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
-	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
-	request(currUrl, function (err, response, body) {
-		if(err){
-			myWeather = null;
-			res.redirect("/");
-		} else {
-			let weather = JSON.parse(body)
-			if(weather.main == undefined){
-				weather = null;
-				//res.redirect("/");
-			} else {
-				var currWeather = {
-					'city': weather.name,
-					'temp': weather.main.temp,
-					'condition': weather.weather[0].main,
-					'icon': weather.weather[0].icon,
-				};
-				myWeather = currWeather;			}
-			}
-		});
-	request(forecastUrl, function (err, response, body) {
-		if(err){
-			myForecast = null;
-			res.redirect("/");
-		} else {
-			let forecast = JSON.parse(body)
-			if(forecast.list == undefined){
-				myForecast = null;
-				res.redirect("/");
-			} else {
-				myForecast = parseForecast(forecast);
-				res.redirect("/");
-			}
-		}
-	});
+	getWeather(zip);
+	res.redirect("/");
 })
 .post('/addTask', function (req, res) {
 	var newTask = req.body.newtask;
@@ -178,7 +144,44 @@ express()
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-
+function getWeather(zip) {
+	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
+	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
+	request(currUrl, function (err, response, body) {
+		if(err){
+			myWeather = null;
+			//res.redirect("/");
+		} else {
+			let weather = JSON.parse(body)
+			if(weather.main == undefined){
+				weather = null;
+				//res.redirect("/");
+			} else {
+				var currWeather = {
+					'city': weather.name,
+					'temp': weather.main.temp,
+					'condition': weather.weather[0].main,
+					'icon': weather.weather[0].icon,
+				};
+				myWeather = currWeather;			}
+			}
+		});
+	request(forecastUrl, function (err, response, body) {
+		if(err){
+			myForecast = null;
+			//res.redirect("/");
+		} else {
+			let forecast = JSON.parse(body)
+			if(forecast.list == undefined){
+				myForecast = null;
+				//res.redirect("/");
+			} else {
+				myForecast = parseForecast(forecast);
+				//res.redirect("/");
+			}
+		}
+	});
+}
 
 function parseForecast(forecast) {
 	console.log(forecast);
@@ -263,9 +266,6 @@ function readDate(dateTime) {
 	var readDate = month + "/" + day + "/" + year;
 	return readDate;
 }
-
-
-
 
 // Load client secrets from a local file.
 function calendarInteract(callback, event) {
