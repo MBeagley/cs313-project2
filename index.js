@@ -145,6 +145,7 @@ express()
 .post("/getEvents", function(req, res) {
 	calendarInteract(listEvents);
 	setTimeout(function () {
+		console.log("Waiting");
 	}, 1000);
 	res.redirect("/");	
 })
