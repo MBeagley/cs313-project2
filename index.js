@@ -124,7 +124,7 @@ function dbConnect(callback) {
 	client.connect();
 	
 	client.query('SELECT * FROM users;', (err, res) => {
-		if (err) throw err;
+		if (err) { throw err; }
 		for (let row of res.rows) {
 			let myRow = JSON.stringify(row);
 			console.log(myRow);
