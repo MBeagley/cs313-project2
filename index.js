@@ -12,11 +12,18 @@ const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
 
-const { Pool } = require('pg');
-const pool = new Pool({
+// const { Pool } = require('pg');
+// const pool = new Pool({
+// 	connectionString: process.env.DATABASE_URL,
+// 	sslmode: require
+// 	//ssl: false
+// });
+
+const { Client } = require('pg');
+
+const client = new Client({
 	connectionString: process.env.DATABASE_URL,
-	sslmode: require
-	//ssl: false
+	ssl: true,
 });
 
 // If modifying these scopes, delete token.json.
@@ -44,19 +51,28 @@ express()
 	res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
 })
 .get('/db', async (req, res) => {
-	try {
-		const client = await pool.connect()
-		const result = await client.query('SELECT * FROM users');
-		const results = { 'results': (result) ? result.rows : null};
-		console.log(results);
-		results.forEach(function(r) {
-			myZipcode = r.zipcode;
-		});
-		client.release();
-	} catch (err) {
-		console.error(err);
-		res.send("Error " + err);
-	}
+	
+	client.query('SELECT * FROM users', (err, res) => {
+		if (err) throw err;
+		for (let row of res.rows) {
+			console.log(JSON.stringify(row));
+		}
+		client.end();
+	});
+
+	// try {
+	// 	const client = await pool.connect()
+	// 	const result = await client.query('SELECT * FROM users');
+	// 	const results = { 'results': (result) ? result.rows : null};
+	// 	console.log(results);
+	// 	results.forEach(function(r) {
+	// 		myZipcode = r.zipcode;
+	// 	});
+	// 	client.release();
+	// } catch (err) {
+	// 	console.error(err);
+	// 	res.send("Error " + err);
+	// }
 	res.redirect("/getWeather");
 })
 .post('/getWeather', function (req, res) {
