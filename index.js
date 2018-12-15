@@ -51,6 +51,8 @@ express()
 	res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
 })
 .get('/db', async (req, res) => {
+
+	client.connect();
 	
 	client.query('SELECT * FROM users;', (err, res) => {
 		if (err) {
