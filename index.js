@@ -52,9 +52,9 @@ express()
 })
 .get('/db', async (req, res) => {
 
-	client.connect();
+	const dbConnect = await client.connect();
 	
-	client.query('SELECT * FROM users;', (err, res) => {
+	const result = await client.query('SELECT * FROM users;', (err, res) => {
 		if (err) throw err;
 		for (let row of res.rows) {
 			let myRow = JSON.stringify(row);
@@ -99,12 +99,9 @@ express()
 					'condition': weather.weather[0].main,
 					'icon': weather.weather[0].icon,
 				};
-				//let weatherText = `It's ${weather.main.temp} degrees in ${weather.name}!`;
-				myWeather = currWeather;
-				//res.redirect("/");
+				myWeather = currWeather;			}
 			}
-		}
-	});
+		});
 	request(forecastUrl, function (err, response, body) {
 		if(err){
 			myForecast = null;
@@ -113,11 +110,9 @@ express()
 			let forecast = JSON.parse(body)
 			if(forecast.list == undefined){
 				myForecast = null;
-				console.log(null);
 				res.redirect("/");
 			} else {
 				myForecast = parseForecast(forecast);
-				console.log(myForecast);
 				res.redirect("/");
 			}
 		}
