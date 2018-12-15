@@ -47,7 +47,7 @@ express()
 		calendarInteract(listEvents);
 		setTimeout(function () {
 			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
-		}, 3000);
+		}, 6000);
 	}
 	else {
 		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
