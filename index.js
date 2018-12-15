@@ -21,11 +21,6 @@ const {google} = require('googleapis');
 
 const { Client } = require('pg');
 
-const client = new Client({
-	connectionString: process.env.DATABASE_URL,
-	ssl: true,
-});
-
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -122,6 +117,11 @@ express()
 
 function dbConnect(callback) {
 	console.log("dbConnect");
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: true,
+	});
+	
 	client.connect();
 	
 	client.query('SELECT * FROM users;', (err, res) => {
