@@ -47,11 +47,16 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	calendarInteract(listEvents);
-	setTimeout(function () {
-		console.log("Waiting");
+	if (myEvents === undefined || myEvents.length == 0) {
+		calendarInteract(listEvents);
+		setTimeout(function () {
+			console.log("Waiting");
+			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
+		}, 2000);
+	}
+	else {
 		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
-	}, 2000);
+	}
 })
 .get('/db', async (req, res) => {
 
