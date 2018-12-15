@@ -47,7 +47,8 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	if (myEvents === undefined || myEvents.length == 0) {
+	if (myEvents === undefined || myEvents.length == 0 || myWeather == null) {
+		dbConnect();
 		calendarInteract(listEvents);
 		setTimeout(function () {
 			console.log("Waiting");
@@ -148,6 +149,20 @@ express()
 	//res.redirect("/");
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+
+function dbConnect() {
+	client.connect();
+	
+	client.query('SELECT * FROM users;', (err, res) => {
+		if (err) throw err;
+		for (let row of res.rows) {
+			let myRow = JSON.stringify(row);
+			console.log(myRow);
+			myZipcode = myRow.zipcode;
+		}
+		client.end();
+	});
+}
 
 function getWeather(zip) {
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
