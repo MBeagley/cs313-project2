@@ -52,9 +52,9 @@ express()
 })
 .get('/db', async (req, res) => {
 
-	const dbConnect = await client.connect();
+	client.connect();
 	
-	const result = await client.query('SELECT * FROM users;', (err, res) => {
+	client.query('SELECT * FROM users;', (err, res) => {
 		if (err) throw err;
 		for (let row of res.rows) {
 			let myRow = JSON.stringify(row);
@@ -144,6 +144,8 @@ express()
 })
 .post("/getEvents", function(req, res) {
 	calendarInteract(listEvents);
+	setTimeout(function () {
+	}, 1000);
 	res.redirect("/");	
 })
 .post("/addEvent", function(req, res) {
