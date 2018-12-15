@@ -145,7 +145,6 @@ express()
 .post("/getEvents", function(req, res) {
 	calendarInteract(listEvents);
 	setTimeout(function () {
-		console.log("Waiting");
 		res.redirect("/");
 	}, 2000);
 	//res.redirect("/");	
@@ -167,7 +166,12 @@ express()
 	calendarInteract(addEvent, event);
 	calendarInteract(listEvents, event);
 
-	res.redirect("/");
+	setTimeout(function () {
+		console.log("Waiting");
+		res.redirect("/");
+	}, 2000);
+
+	//res.redirect("/");
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
