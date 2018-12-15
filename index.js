@@ -52,7 +52,7 @@ express()
 })
 .get('/db', async (req, res) => {
 	
-	client.query('SELECT * FROM users', (err, res) => {
+	client.query('SELECT * FROM users;', (err, res) => {
 		if (err) {
 			console.log(err); 
 			throw err; 
