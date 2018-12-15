@@ -80,12 +80,7 @@ express()
 	res.redirect("/");
 })
 .post('/getWeather', function (req, res) {
-	if (myZipcode == null) {
-		let zip = req.body.zip;
-	}
-	else {
-		let zip = myZipcode;
-	}
+	let zip = req.body.zip;
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
 	request(currUrl, function (err, response, body) {
