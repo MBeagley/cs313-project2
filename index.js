@@ -80,7 +80,7 @@ express()
 	res.redirect("/");
 })
 .post('/getWeather', function (req, res) {
-	if (myZipcode !== null) {
+	if (myZipcode == null) {
 		let zip = req.body.zip;
 	}
 	else {
