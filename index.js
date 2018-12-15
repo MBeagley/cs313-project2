@@ -141,6 +141,7 @@ function dbConnect(callback) {
 }
 
 function getWeather(zip) {
+	console.log("getWeather");
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
 	request(currUrl, function (err, response, body) {
@@ -180,6 +181,7 @@ function getWeather(zip) {
 }
 
 function parseForecast(forecast) {
+	console.log("parseForecast");
 	console.log(forecast);
 	var day1 = readDate(forecast.list[5].dt_txt);
 	var day2 = readDate(forecast.list[13].dt_txt);
@@ -370,9 +372,9 @@ function readableDate(dateTime){
  			events.map((event, i) => {
  				const start = event.start.dateTime || event.start.date;
  				var readDate = readableDate(start);
- 				console.log(`${readDate} - ${event.summary}`);
+ 				//console.log(`${readDate} - ${event.summary}`);
  				myEvents.push(`${readDate} - ${event.summary}`);
- 				console.log(myEvents);
+ 				//console.log(myEvents);
  			});
  		} else {
  			console.log('No upcoming events found.');
