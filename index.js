@@ -54,6 +54,7 @@ express()
 	
 	client.query('SELECT * FROM users', (err, res) => {
 		if (err) throw err;
+		console.log("no error");
 		for (let row of res.rows) {
 			console.log(JSON.stringify(row));
 		}
