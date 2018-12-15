@@ -162,6 +162,7 @@ function getWeather(zip) {
 				};
 				myWeather = currWeather;			}
 			}
+			console.log("end local weather");
 		});
 	request(forecastUrl, function (err, response, body) {
 		if(err){
@@ -177,6 +178,7 @@ function getWeather(zip) {
 				//res.redirect("/");
 			}
 		}
+		console.log("end forecast");
 	});
 }
 
