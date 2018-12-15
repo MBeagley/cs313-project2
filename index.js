@@ -56,9 +56,8 @@ express()
 	
 	client.query('SELECT * FROM users;', (err, res) => {
 		if (err) throw err;
-		console.log("no error");
 		for (let row of res.rows) {
-			let myRow = JSON.stringify(row)
+			let myRow = JSON.stringify(row);
 			console.log(myRow);
 			myZipcode = myRow.zipcode;
 		}
