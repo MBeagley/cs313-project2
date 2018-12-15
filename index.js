@@ -109,7 +109,7 @@ express()
 	setTimeout(function () {
 		console.log("Waiting");
 		res.redirect("/");
-	}, 2000);
+	}, 3000);
 
 	//res.redirect("/");
 })
@@ -121,7 +121,7 @@ function dbConnect(callback) {
 		connectionString: process.env.DATABASE_URL,
 		ssl: true,
 	});
-	
+
 	client.connect();
 	
 	client.query('SELECT * FROM users;', (err, res) => {
