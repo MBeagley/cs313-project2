@@ -121,6 +121,7 @@ express()
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 function dbConnect(callback) {
+	console.log("dbConnect");
 	client.connect();
 	
 	client.query('SELECT * FROM users;', (err, res) => {
