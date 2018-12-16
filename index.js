@@ -162,6 +162,7 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
+				console.log(myNote);
 			}
 		}
 		client.end();
