@@ -62,7 +62,7 @@ express()
 .post('/addTask', function (req, res) {
 	var newTask = req.body.newtask;
 
-	dbUpdate("task", newtask);
+	dbUpdate("task", newTask);
 
 	task.push(newTask);
 
