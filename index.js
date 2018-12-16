@@ -74,13 +74,14 @@ express()
 
 	if (typeof completeTask === "string") {
 		complete.push(completeTask);
-
 		task.splice(task.indexOf(completeTask), 1);
+		dbUpdate("delete", completeTask);
 		complete = [];
 	} else if (typeof completeTask === "object") {
 		for (var i = 0; i < completeTask.length; i++) {     
 			complete.push(completeTask[i]);
 			task.splice(task.indexOf(completeTask[i]), 1);
+			dbUpdate("delete", completeTask[i]);
 			complete = [];
 		}
 	}
@@ -161,6 +162,12 @@ function dbUpdate(table, value) {
 		qString += value;
 		qString += "');";
 	}
+	else if (table == "delete") {
+		//DELETE FROM link WHERE id = 8;
+		var qString = "DELETE FROM toDo WHERE title=";
+		qString += value;
+		qString += ";";
+	}
 
 // 	CREATE TABLE toDo (
 // 	id SERIAL,
@@ -172,18 +179,18 @@ function dbUpdate(table, value) {
 // );
 
 // INSERT INTO users (username,password,zipcode) VALUES ('user','password','84047');
-	console.log(qString); 
-	
-	client.query(qString, (err, res) => {
-		if (err) {
-			console.log(err); 
-			throw err; 
-		}
-		client.end();
-	});
+console.log(qString); 
+
+client.query(qString, (err, res) => {
+	if (err) {
+		console.log(err); 
+		throw err; 
+	}
+	client.end();
+});
 
 
-	console.log("end update");	
+console.log("end update");	
 }
 
 function getWeather(zip) {
