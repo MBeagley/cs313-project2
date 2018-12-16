@@ -148,7 +148,7 @@ function dbUpdate(newZip) {
 
 	client.connect();
 
-	var qString = "UPDATE users SET zipode=";
+	var qString = "UPDATE users SET zipcode=";
 	qString += newZip;
 	qString += " WHERE id=1;";
 	console.log(qString); 
