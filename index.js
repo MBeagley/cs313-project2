@@ -164,9 +164,9 @@ function dbUpdate(table, value) {
 	}
 	else if (table == "delete") {
 		//DELETE FROM link WHERE id = 8;
-		var qString = "DELETE FROM toDo WHERE title=";
+		var qString = "DELETE FROM toDo WHERE title='";
 		qString += value;
-		qString += ";";
+		qString += "';";
 	}
 
 // 	CREATE TABLE toDo (
