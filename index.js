@@ -126,6 +126,16 @@ express()
 
 	//res.redirect("/");
 })
+.post("/saveNote", function(req, res) {
+	var newNote = req.body.note;
+
+	dbUpdate("note", newNote);
+	myNote = newNote;
+	setTimeout(function () {
+		res.redirect("/");
+	}, 1000);
+	//res.redirect("/");	
+})
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 function dbRead(table) {
@@ -193,6 +203,11 @@ function dbUpdate(table, value) {
 		var qString = "DELETE FROM toDo WHERE title='";
 		qString += value;
 		qString += "';";
+	}
+	if (table == "note") {
+		var qString = "UPDATE notes SET content='";
+		qString += value;
+		qString += "' WHERE id=1;";
 	}
 
 	console.log(qString); 
