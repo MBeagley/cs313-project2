@@ -151,12 +151,12 @@ function dbUpdate(table, value) {
 	client.connect();
 
 	if (table == "zipcode") {
-		var qString += "UPDATE users SET zipcode=";
+		var qString = "UPDATE users SET zipcode=";
 		qString += value;
 		qString += " WHERE id=1;";
 	}
 	else if (table == "task") {
-		var qString += "INSERT INTO toDO (userId, title) VALUES (1, '";
+		var qString = "INSERT INTO toDO (userId, title) VALUES (1, '";
 		qString += value;
 		qString += "');";
 	}
