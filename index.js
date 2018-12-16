@@ -4,6 +4,7 @@ var http = require('http');
 const bodyParser = require('body-parser');
 const sanitizer = require('sanitize');
 const { check } = require('express-validator/check');
+const decode = require('unescape');
 
 const express = require('express')
 const path = require('path')
@@ -176,7 +177,7 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
-				myNote = unescape(myNote);
+				myNote = decode(myNote);
 				console.log(myNote);
 			}
 		}
