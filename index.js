@@ -176,7 +176,7 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
-				check(myNote).unescape();
+				unescape(myNote);
 				console.log(myNote);
 			}
 		}
