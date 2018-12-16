@@ -124,13 +124,13 @@ function dbConnect(callback) {
 
 	client.connect();
 	
-	client.query('SELECT * FROM users;', (err, res) => {
+	client.query('SELECT zipcode FROM users;', (err, res) => {
 		if (err) {
 			console.log(err); 
 			throw err; 
 		}
 		for (let row of res.rows) {
-			let myRow = JSON.parse(row);
+			let myRow = JSON.stringify(row);
 			console.log(myRow);
 			myZipcode = myRow.zipcode;
 			console.log("zip:" + myZipcode);
@@ -140,10 +140,7 @@ function dbConnect(callback) {
 
 	setTimeout(function () {
 		callback(myZipcode);
-	}, 1000);
-
-
-	
+	}, 1000);	
 }
 
 function getWeather(zip) {
