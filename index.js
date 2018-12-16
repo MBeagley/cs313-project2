@@ -43,7 +43,7 @@ express()
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
 	if (myEvents === undefined || myEvents.length == 0 || myWeather == null) {
-		dbConnect(getWeather);
+		dbRead(getWeather);
 		calendarInteract(listEvents);
 		setTimeout(function () {
 			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
@@ -55,6 +55,7 @@ express()
 })
 .post('/getWeather', function (req, res) {
 	let zip = req.body.zip;
+	dbUpdate(zip);
 	getWeather(zip);
 	res.redirect("/");
 })
@@ -115,8 +116,7 @@ express()
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-function dbConnect(callback) {
-	console.log("dbConnect");
+function dbRead(callback) {
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
 		ssl: true,
@@ -138,6 +138,36 @@ function dbConnect(callback) {
 	setTimeout(function () {
 		callback(myZipcode);
 	}, 1000);	
+}
+
+function dbUpdate(newZip) {
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: true,
+	});
+
+	client.connect();
+
+	UPDATE statistics SET wins=:wins WHERE player=:player AND character=:character
+	var qString = "UPDATE users SET zipode=";
+	qString += newZip;
+	qString += " WHERE id=1";
+	
+	client.query(qString, (err, res) => {
+		if (err) {
+			console.log(err); 
+			throw err; 
+		}
+		client.end();
+	});
+
+
+	console.log("end update"); 
+
+
+	// setTimeout(function () {
+	// 	callback(myZipcode);
+	// }, 1000);	
 }
 
 function getWeather(zip) {
