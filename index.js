@@ -53,12 +53,12 @@ express()
 		calendarInteract(listEvents);
 		setTimeout(function () {
 			console.log(myNote);
-			
+
 			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 		}, 6000);
 	}
 	else {
-		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
+		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 	}
 })
 .post('/getWeather', function (req, res) {
