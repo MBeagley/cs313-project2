@@ -42,8 +42,12 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	if (myEvents === undefined || myEvents.length == 0 || myWeather == null) {
-		dbRead(getWeather);
+	if (myEvents === undefined || myEvents.length == 0 || myWeather == null || task.length == 0) {
+		dbRead(zipcode);
+		setTimeout(function () {
+			getWeather(myZipcode);
+		}, 1000);
+		dbRead(task);
 		calendarInteract(listEvents);
 		setTimeout(function () {
 			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
@@ -120,28 +124,38 @@ express()
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-function dbRead(callback) {
+function dbRead(table) {
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
 		ssl: true,
 	});
 
 	client.connect();
+
+	if (table == "zipcode") {
+		var qString = "SELECT zipcode FROM users;";
+	}
+	else if (table == "task") {
+		var qString = "SELECT title FROM toDO WHERE userId=1";
+	}
 	
-	client.query('SELECT zipcode FROM users;', (err, res) => {
+	client.query(qString, (err, res) => {
 		if (err) {
 			console.log(err); 
 			throw err; 
 		}
-		for (let row of res.rows) {
-			myZipcode = row.zipcode;
+		if (table == "zipcode") {
+			for (let row of res.rows) {
+				myZipcode = row.zipcode;
+			}
+		}
+		else if (table == "task") {
+			for (let row of res.rows) {
+				task.push(row.title);
+			}
 		}
 		client.end();
-	});
-
-	setTimeout(function () {
-		callback(myZipcode);
-	}, 1000);	
+	});	
 }
 
 function dbUpdate(table, value) {
