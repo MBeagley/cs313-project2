@@ -130,11 +130,7 @@ function dbConnect(callback) {
 			throw err; 
 		}
 		for (let row of res.rows) {
-			console.log(row);
-			var myRow = JSON.stringify(row);
-			console.log(myRow);
 			myZipcode = row.zipcode;
-			console.log("zip:" + myZipcode);
 		}
 		client.end();
 	});
@@ -145,9 +141,6 @@ function dbConnect(callback) {
 }
 
 function getWeather(zip) {
-	console.log("getWeather");
-	console.log("zip:" + myZipcode);
-	console.log(zip);
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
 	request(currUrl, function (err, response, body) {
@@ -168,7 +161,6 @@ function getWeather(zip) {
 				};
 				myWeather = currWeather;			}
 			}
-			console.log("end local weather");
 		});
 	request(forecastUrl, function (err, response, body) {
 		if(err){
@@ -184,13 +176,10 @@ function getWeather(zip) {
 				//res.redirect("/");
 			}
 		}
-		console.log("end forecast");
 	});
 }
 
 function parseForecast(forecast) {
-	console.log("parseForecast");
-	console.log(forecast);
 	var day1 = readDate(forecast.list[5].dt_txt);
 	var day2 = readDate(forecast.list[13].dt_txt);
 	var day3 = readDate(forecast.list[21].dt_txt);
