@@ -77,9 +77,7 @@
         <br/>
         <form action ="/saveNote" name="note" method="POST" style="width: 100%;height: 100%;">
           <textarea>
-            <% if(note !== null){ %>
             <%= note %>
-            <% } %>
           </textarea>
           <button formaction="/saveNote" type="submit"> Save </button>
         </form>
