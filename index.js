@@ -55,12 +55,14 @@ express()
 })
 .post('/getWeather', function (req, res) {
 	let zip = req.body.zip;
-	dbUpdate(zip);
+	dbUpdate("zipcode", zip);
 	getWeather(zip);
 	res.redirect("/");
 })
 .post('/addTask', function (req, res) {
 	var newTask = req.body.newtask;
+
+	dbUpdate("task", newtask);
 
 	task.push(newTask);
 
@@ -140,7 +142,7 @@ function dbRead(callback) {
 	}, 1000);	
 }
 
-function dbUpdate(newZip) {
+function dbUpdate(table, value) {
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
 		ssl: true,
@@ -148,9 +150,29 @@ function dbUpdate(newZip) {
 
 	client.connect();
 
-	var qString = "UPDATE users SET zipcode=";
-	qString += newZip;
-	qString += " WHERE id=1;";
+	var qString;
+
+	if (table == "zipcode") {
+		qString += "UPDATE users SET zipcode=";
+		qString += value;
+		qString += " WHERE id=1;";
+	}
+	else if (table == "task") {
+		qString += "INSERT INTO toDO (userId, title) VALUES (1, '";
+		qString += value;
+		qString += "');";
+	}
+
+// 	CREATE TABLE toDo (
+// 	id SERIAL,
+// 	userId INTEGER NOT NULL,
+// 	title VARCHAR(255),
+// 	done BOOLEAN,
+// 	PRIMARY KEY (id),
+// 	FOREIGN KEY (userId) REFERENCES users(id)
+// );
+
+// INSERT INTO users (username,password,zipcode) VALUES ('user','password','84047');
 	console.log(qString); 
 	
 	client.query(qString, (err, res) => {
@@ -162,12 +184,7 @@ function dbUpdate(newZip) {
 	});
 
 
-	console.log("end update"); 
-
-
-	// setTimeout(function () {
-	// 	callback(myZipcode);
-	// }, 1000);	
+	console.log("end update");	
 }
 
 function getWeather(zip) {
