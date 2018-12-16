@@ -147,10 +147,11 @@ function dbUpdate(newZip) {
 	});
 
 	client.connect();
-	
+
 	var qString = "UPDATE users SET zipode=";
 	qString += newZip;
 	qString += " WHERE id=1";
+	console.log(qString); 
 	
 	client.query(qString, (err, res) => {
 		if (err) {
