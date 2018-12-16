@@ -75,9 +75,10 @@
           <h3>Notes</h3>
         </div>
         <br/>
-        <form action ="/saveNote" method="POST" style="width: 100%;height: 100%;">
+        <form action ="/saveNote" name="note" method="POST" style="width: 100%;height: 100%;">
           <textarea>
-            This is a bunch of filler text! YAY! 
+            <% if(note !== null){ %>
+            <%= note %>
           </textarea>
           <button formaction="/saveNote" type="submit"> Save </button>
         </form>

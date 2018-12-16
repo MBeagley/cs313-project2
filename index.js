@@ -34,6 +34,7 @@ var myWeather = null;
 var myEvents = [];
 var myForecast = null;
 var myZipcode = null;
+var myNote = null;
 
 express()
 .use(express.static(path.join(__dirname, 'public')))
@@ -42,15 +43,16 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	if (myEvents === undefined || myEvents.length == 0 || myWeather == null || task.length == 0) {
+	if (myEvents === undefined || myEvents.length == 0 || myWeather == null || task.length == 0 || myNote = null) {
 		dbRead("zipcode");
 		setTimeout(function () {
 			getWeather(myZipcode);
 		}, 1000);
 		dbRead("task");
+		dbRead("note");
 		calendarInteract(listEvents);
 		setTimeout(function () {
-			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents});
+			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 		}, 6000);
 	}
 	else {
@@ -138,6 +140,9 @@ function dbRead(table) {
 	else if (table == "task") {
 		var qString = "SELECT title FROM toDO WHERE userId=1";
 	}
+	else if (table == "note") {
+		var qString = "SELECT content FROM notes WHERE userId=1";
+	}
 	
 	client.query(qString, (err, res) => {
 		if (err) {
@@ -152,6 +157,11 @@ function dbRead(table) {
 		else if (table == "task") {
 			for (let row of res.rows) {
 				task.push(row.title);
+			}
+		}
+		else if (table == "note") {
+			for (let row of res.rows) {
+				myNote = row.content;
 			}
 		}
 		client.end();

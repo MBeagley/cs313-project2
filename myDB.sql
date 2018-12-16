@@ -26,3 +26,4 @@ CREATE TABLE toDo (
 );
 
 INSERT INTO users (username,password,zipcode) VALUES ('user','password','84047');
+INSERT INTO notes (name,userId,content) VALUES ('my note',1,'This is my note!');
