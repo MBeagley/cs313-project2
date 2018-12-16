@@ -177,6 +177,7 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
+				console.log("decode: " + decode(myNote));
 				myNote = decode(myNote);
 				console.log(myNote);
 			}
