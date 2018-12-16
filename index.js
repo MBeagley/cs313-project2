@@ -130,9 +130,9 @@ function dbConnect(callback) {
 			throw err; 
 		}
 		for (let row of res.rows) {
-			let myRow = JSON.stringify(row);
+			let myRow = JSON.parse(row);
 			console.log(myRow);
-			myZipcode = myRow["zipcode"];
+			myZipcode = myRow.zipcode;
 			console.log("zip:" + myZipcode);
 		}
 		client.end();
