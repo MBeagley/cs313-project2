@@ -64,7 +64,7 @@ express()
 		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 	}
 })
-.post('/getWeather', [check('zip').isLength({ min: 5, max: 5 }).escape()], function (req, res) {
+.post('/getWeather', [check('zip').escape()], function (req, res) {
 	let zip = req.body.zip;
 	dbUpdate("zipcode", zip);
 	getWeather(zip);
@@ -177,8 +177,6 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
-				console.log("decode: " + decode(myNote));
-				myNote = decode(myNote);
 				console.log(myNote);
 			}
 		}
