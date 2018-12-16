@@ -3,6 +3,7 @@ const argv = require('yargs').argv;
 var http = require('http');
 const bodyParser = require('body-parser');
 const sanitizer = require('sanitize');
+const { check } = require('express-validator/check');
 
 const express = require('express')
 const path = require('path')
