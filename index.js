@@ -147,8 +147,7 @@ function dbUpdate(newZip) {
 	});
 
 	client.connect();
-
-	UPDATE statistics SET wins=:wins WHERE player=:player AND character=:character
+	
 	var qString = "UPDATE users SET zipode=";
 	qString += newZip;
 	qString += " WHERE id=1";
