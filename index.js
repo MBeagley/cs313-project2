@@ -52,6 +52,8 @@ express()
 		dbRead("note");
 		calendarInteract(listEvents);
 		setTimeout(function () {
+			console.log(myNote);
+			
 			res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 		}, 6000);
 	}
@@ -161,9 +163,6 @@ function dbRead(table) {
 		}
 		else if (table == "note") {
 			for (let row of res.rows) {
-				var myNote = {
-					'content': row.content,
-				};
 				myNote = row.content;
 				console.log(myNote);
 			}
