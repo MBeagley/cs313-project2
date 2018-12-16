@@ -147,6 +147,7 @@ function dbConnect(callback) {
 
 function getWeather(zip) {
 	console.log("getWeather");
+	console.log(zip);
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
 	request(currUrl, function (err, response, body) {
