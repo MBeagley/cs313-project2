@@ -15,13 +15,6 @@ const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
 
-// const { Pool } = require('pg');
-// const pool = new Pool({
-// 	connectionString: process.env.DATABASE_URL,
-// 	sslmode: require
-// 	//ssl: false
-// });
-
 const { Client } = require('pg');
 
 // If modifying these scopes, delete token.json.
@@ -102,8 +95,7 @@ express()
 	calendarInteract(listEvents);
 	setTimeout(function () {
 		res.redirect("/");
-	}, 2000);
-	//res.redirect("/");	
+	}, 2000);	
 })
 .post("/addEvent", function(req, res) {
 	var start = req.body.startTime + ":00-07:00";
@@ -126,8 +118,6 @@ express()
 		console.log("Waiting");
 		res.redirect("/");
 	}, 2000);
-
-	//res.redirect("/");
 })
 .post("/saveNote", [check('note').escape()], function(req, res) {
 	var newNote = req.body.note;
@@ -136,8 +126,7 @@ express()
 	myNote = newNote;
 	setTimeout(function () {
 		res.redirect("/");
-	}, 1000);
-	//res.redirect("/");	
+	}, 1000);	
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
@@ -233,12 +222,10 @@ function getWeather(zip) {
 	request(currUrl, function (err, response, body) {
 		if(err){
 			myWeather = null;
-			//res.redirect("/");
 		} else {
 			let weather = JSON.parse(body)
 			if(weather.main == undefined){
 				weather = null;
-				//res.redirect("/");
 			} else {
 				var currWeather = {
 					'city': weather.name,
@@ -252,15 +239,12 @@ function getWeather(zip) {
 	request(forecastUrl, function (err, response, body) {
 		if(err){
 			myForecast = null;
-			//res.redirect("/");
 		} else {
 			let forecast = JSON.parse(body)
 			if(forecast.list == undefined){
 				myForecast = null;
-				//res.redirect("/");
 			} else {
 				myForecast = parseForecast(forecast);
-				//res.redirect("/");
 			}
 		}
 	});
@@ -337,7 +321,6 @@ function parseForecast(forecast) {
 }
 
 function readDate(dateTime) {
-	//2018-12-12 21:00:00
 	var myDateTime = dateTime.split(" ");
 	var date = myDateTime[0].split("-");
 
@@ -409,7 +392,6 @@ function getAccessToken(oAuth2Client, callback) {
 }
 
 function readableDate(dateTime){
-	//2018-12-11T10:00:00-07:00
 	var myDateTime = dateTime.split("T");
 	var date = myDateTime[0].split("-");
 	var time = myDateTime[1].split(":");
@@ -456,9 +438,7 @@ function readableDate(dateTime){
  			events.map((event, i) => {
  				const start = event.start.dateTime || event.start.date;
  				var readDate = readableDate(start);
- 				//console.log(`${readDate} - ${event.summary}`);
  				myEvents.push(`${readDate} - ${event.summary}`);
- 				//console.log(myEvents);
  			});
  		} else {
  			console.log('No upcoming events found.');

@@ -42,7 +42,7 @@
         <div class="innerColumn">
           <h3>Change City</h3>
           <form action="/getWeather" method="post">
-            <input name="zip" type="text" placeholder="Enter a Zip Code" required>
+            <input name="zip" type="text" placeholder="Enter a Zip Code" maxlength="5" required>
             <input type="submit" value="Get Weather">
           </form>
           <% if(weather !== null){ %>
