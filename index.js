@@ -137,7 +137,12 @@ function dbConnect(callback) {
 		client.end();
 	});
 
-	callback(myZipcode);
+	setTimeout(function () {
+		callback(myZipcode);
+	}, 1000);
+
+
+	
 }
 
 function getWeather(zip) {
