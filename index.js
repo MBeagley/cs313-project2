@@ -133,6 +133,7 @@ function dbConnect(callback) {
 			let myRow = JSON.stringify(row);
 			console.log(myRow);
 			myZipcode = myRow[1].zipcode;
+			console.log("zip:" + myZipcode);
 		}
 		client.end();
 	});
@@ -147,6 +148,7 @@ function dbConnect(callback) {
 
 function getWeather(zip) {
 	console.log("getWeather");
+	console.log("zip:" + myZipcode);
 	console.log(zip);
 	let currUrl = `http://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=${apiKey}`
 	let forecastUrl = `http://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&units=imperial&appid=${apiKey}`
