@@ -127,8 +127,8 @@ express()
 
 	//res.redirect("/");
 })
-.post("/saveNote", function(req, res) {
-	var newNote = sanitizer.value(req.body.note, 'string');
+.post("/saveNote", [check('note').escape()], function(req, res) {
+	var newNote = req.body.note;
 
 	dbUpdate("note", newNote);
 	myNote = newNote;
