@@ -63,13 +63,13 @@ express()
 		res.render('homepage', {weather: myWeather, forecast: myForecast, task: task, events: myEvents, note: myNote});
 	}
 })
-.post('/getWeather', function (req, res) {
+.post('/getWeather', [check('zip').isLength({ min: 5, max: 5 }).escape()], function (req, res) {
 	let zip = req.body.zip;
 	dbUpdate("zipcode", zip);
 	getWeather(zip);
 	res.redirect("/");
 })
-.post('/addTask', function (req, res) {
+.post('/addTask', [check('newTask').escape()], function (req, res) {
 	var newTask = req.body.newtask;
 
 	dbUpdate("task", newTask);
@@ -176,6 +176,7 @@ function dbRead(table) {
 		else if (table == "note") {
 			for (let row of res.rows) {
 				myNote = row.content;
+				check(myNote).unescape();
 				console.log(myNote);
 			}
 		}
