@@ -43,7 +43,7 @@ express()
 .set('views', path.join(__dirname, 'views'))
 .set('view engine', 'ejs')
 .get('/', function (req, res) {
-	if (myEvents === undefined || myEvents.length == 0 || myWeather == null || task.length == 0 || myNote = null) {
+	if (myEvents === undefined || myEvents.length == 0 || myWeather == null || task.length == 0 || myNote == null) {
 		dbRead("zipcode");
 		setTimeout(function () {
 			getWeather(myZipcode);
