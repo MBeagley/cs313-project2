@@ -161,6 +161,9 @@ function dbRead(table) {
 		}
 		else if (table == "note") {
 			for (let row of res.rows) {
+				var myNote = {
+					'content': row.content,
+				};
 				myNote = row.content;
 				console.log(myNote);
 			}
@@ -193,18 +196,18 @@ function dbUpdate(table, value) {
 		qString += "';";
 	}
 
-console.log(qString); 
+	console.log(qString); 
 
-client.query(qString, (err, res) => {
-	if (err) {
-		console.log(err); 
-		throw err; 
-	}
-	client.end();
-});
+	client.query(qString, (err, res) => {
+		if (err) {
+			console.log(err); 
+			throw err; 
+		}
+		client.end();
+	});
 
 
-console.log("end update");	
+	console.log("end update");	
 }
 
 function getWeather(zip) {
