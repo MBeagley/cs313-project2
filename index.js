@@ -70,6 +70,7 @@ express()
 })
 .post("/removetask", function(req, res) {
 	var completeTask = req.body.check;
+	console.log(completeTask);
 
 	if (typeof completeTask === "string") {
 		complete.push(completeTask);
