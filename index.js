@@ -177,22 +177,11 @@ function dbUpdate(table, value) {
 		qString += "');";
 	}
 	else if (table == "delete") {
-		//DELETE FROM link WHERE id = 8;
 		var qString = "DELETE FROM toDo WHERE title='";
 		qString += value;
 		qString += "';";
 	}
 
-// 	CREATE TABLE toDo (
-// 	id SERIAL,
-// 	userId INTEGER NOT NULL,
-// 	title VARCHAR(255),
-// 	done BOOLEAN,
-// 	PRIMARY KEY (id),
-// 	FOREIGN KEY (userId) REFERENCES users(id)
-// );
-
-// INSERT INTO users (username,password,zipcode) VALUES ('user','password','84047');
 console.log(qString); 
 
 client.query(qString, (err, res) => {
