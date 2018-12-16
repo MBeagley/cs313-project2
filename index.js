@@ -2,6 +2,7 @@ const request = require('request');
 const argv = require('yargs').argv;
 var http = require('http');
 const bodyParser = require('body-parser');
+const sanitizer = require('sanitize');
 
 const express = require('express')
 const path = require('path')
@@ -127,7 +128,7 @@ express()
 	//res.redirect("/");
 })
 .post("/saveNote", function(req, res) {
-	var newNote = req.body.note;
+	var newNote = sanitizer.value(req.body.note, 'string');
 
 	dbUpdate("note", newNote);
 	myNote = newNote;
